@@ -1,7 +1,7 @@
 version: "2"
 services:
   ui-components:
-    image: openlmis/dev-ui:9.0.0
+    image: siglusdevops/dev-ui
     ports:
       - "9000:9000"
       - "9876:9876"
@@ -11,4 +11,4 @@ services:
     env_file: .env
   image:
     build: .
-    image: openlmis/ui-components
+    image: siglusdevops/ui-components
