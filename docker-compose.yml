@@ -1,6 +1,7 @@
 version: "2"
 services:
   ui-components:
+    user: "${UID}"
     image: siglusdevops/dev-ui
     ports:
       - "9000:9000"
