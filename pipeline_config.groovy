@@ -8,5 +8,5 @@
 */
 libraries{
   dev_ui
-  notify
+  slack
 }
