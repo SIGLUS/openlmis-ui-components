@@ -8,4 +8,5 @@
 */
 libraries{
   dev_ui
+  notify
 }
