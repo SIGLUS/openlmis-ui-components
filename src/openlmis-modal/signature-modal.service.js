@@ -34,7 +34,7 @@
 
         this.confirm = confirm;
 
-        function confirm(titleMessage, confirmButtonMessage, cancelButtonMessage) {
+        function confirm(message, confirmButtonMessage, cancelButtonMessage) {
             var deferred = $q.defer();
 
             openlmisModalService.createDialog({
@@ -43,13 +43,13 @@
                 controllerAs: 'vm',
                 resolve: {
                     confirmMessage: function() {
-                        return confirmButtonMessage ? confirmButtonMessage : 'openlmisModal.ok';
+                        return confirmButtonMessage ? confirmButtonMessage : 'openlmisModal.confirm';
                     },
                     cancelMessage: function() {
                         return cancelButtonMessage ? cancelButtonMessage : 'openlmisModal.cancel';
                     },
-                    titleMessage: function() {
-                        return titleMessage;
+                    message: function() {
+                        return message;
                     },
                     confirmDeferred: function() {
                         return deferred;

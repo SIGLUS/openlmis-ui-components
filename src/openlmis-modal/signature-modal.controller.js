@@ -29,10 +29,10 @@
         .controller('SignatureModalController', controller);
 
     controller.$inject = [
-        'titleMessage', 'confirmMessage', 'cancelMessage', 'confirmDeferred', 'modalDeferred'
+        'message', 'confirmMessage', 'cancelMessage', 'confirmDeferred', 'modalDeferred'
     ];
 
-    function controller(titleMessage, confirmMessage, cancelMessage, confirmDeferred, modalDeferred) {
+    function controller(message, confirmMessage, cancelMessage, confirmDeferred, modalDeferred) {
         var vm = this;
 
         vm.$onInit = onInit;
@@ -44,12 +44,12 @@
          * @ngdoc property
          * @propertyOf openlmis-modal.controller:SignatureModalController
          * @type {String}
-         * @name titleMessage
+         * @name message
          *
          * @description
          * The message to be displayed on the header.
          */
-        vm.titleMessage = undefined;
+        vm.message = undefined;
 
         /**
          * @ngdoc property
@@ -82,7 +82,7 @@
          * Initialization method of the SignatureModalController.
          */
         function onInit() {
-            vm.titleMessage = titleMessage;
+            vm.message = message;
             vm.confirmMessage = confirmMessage;
             vm.cancelMessage = cancelMessage;
         }

@@ -1,5 +1,6 @@
 {
     "openlmisModal.cancel": "Cancel",
     "openlmisModal.close": "Close",
-    "openlmisModal.ok": "OK"
+    "openlmisModal.ok": "OK",
+    "openlmisModal.confirm": "Confirm"
 }
