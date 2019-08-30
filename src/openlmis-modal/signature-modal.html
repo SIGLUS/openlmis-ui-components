@@ -8,7 +8,7 @@
                 <h1 class="modal-title" style="height:16px"></h1>
             </div>
             <div class="modal-body" style="padding-top: 20px">
-                <label for="signature">{{vm.message | message}}</label>
+                <label for="signature" class="required">{{vm.message | message}}</label>
                 <input id="signature" type="text" ng-model="vm.signature" ng-required="vm.signatureIsRequired" />
             </div>
             <div class="modal-footer">
