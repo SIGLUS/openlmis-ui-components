@@ -7,7 +7,7 @@
             <div class="modal-body">
                 <p ng-if="vm.message">{{vm.message | message}}</p>
                 <form class="form-inline" ng-if="!vm.isDisabled" ng-submit="vm.addAdjustment()" reload-form>
-                    <div class="form-group">
+                    <div class="form-group max-width-form-group">
                         <label for="reason">
                             {{'openlmisAdjustments.reason' | message}}
                         </label>
@@ -17,7 +17,7 @@
                             required>
                         </select>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group max-width-form-group">
                         <label for="quantity">
                             {{'openlmisAdjustments.quantity' | message}}
                         </label>
@@ -26,7 +26,7 @@
                                ng-model="vm.quantity"
                                required positive-integer/>
                     </div>
-                    <button class="add" type="submit">
+                    <button class="add adjust-add" type="submit">
                         {{'openlmisAdjustments.add' | message}}
                     </button>
                 </form>
