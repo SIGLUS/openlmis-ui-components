@@ -78,7 +78,7 @@
          * Initiates the pagination service and fires up a listener for state changes.
          */
         function init() {
-            $rootScope.$on('$stateChangeStart', function(event, toState) {
+            $rootScope.$on('$stateChangeSuccess', function(event, toState) {
                 clearPaginationParamsMap(toState.name);
                 stateName = toState.name;
             });
