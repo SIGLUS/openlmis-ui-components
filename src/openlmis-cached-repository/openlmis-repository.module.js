@@ -18,37 +18,17 @@
     'use strict';
 
     /**
-     * @ngdoc filter
-     * @name openlmis-datetime.filter:openlmisBsDatetime
+     * @module openlmis-cached-repository
      *
      * @description
-     * Parses the given datetime into more user-friendly string.
-     *
-     * @param   {String}  datetime  the datetime to be formatted
-     * @return  {String}            the formated datetime
-     *
-     * @example
-     * In the HTML:
-     * ```
-     * <td>{{datetime | openlmisBsDatetime}}</td>
-     * ```
-     * In the JS:
-     * ```
-     * $filter('datetime')(openlmisBsDatetime);
-     * ```
+     * Provides OpenLMISCachedRepository and OpenLMISRepositoryImpl classes.
      */
-    angular
-        .module('openlmis-datetime')
-        .filter('openlmisBsDatetime', openlmisBsDatetimeFilter);
-
-    openlmisBsDatetimeFilter.$inject = ['moment'];
-
-    function openlmisBsDatetimeFilter(moment) {
-        return function(datetime) {
-            if (datetime) {
-                return moment(datetime).format('L LT');
-            }
-        };
-    }
+    angular.module('openlmis-cached-repository', [
+        'openlmis-config',
+        'openlmis-urls',
+        'ngResource',
+        'openlmis-database',
+        'openlmis-local-storage'
+    ]);
 
 })();

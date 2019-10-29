@@ -38,6 +38,7 @@
         OpenlmisResource.prototype.update = update;
         OpenlmisResource.prototype.create = create;
         OpenlmisResource.prototype.delete = deleteObject;
+        OpenlmisResource.prototype.search = search;
         OpenlmisResource.prototype.throwMethodNotSupported = throwMethodNotSupported;
 
         return OpenlmisResource;
@@ -68,6 +69,8 @@
             }
 
             resourceUrl = openlmisUrlFactory(resourceUrl);
+            this.resourceUrl = resourceUrl;
+            this.lastModified = undefined;
 
             this.resource = $resource(resourceUrl + '/:id', {}, {
                 query: {
@@ -81,6 +84,7 @@
 
             this.idParam = getIdParam(config);
             this.splitter = new ParameterSplitter();
+            this.isVersioned = isVersioned(config);
         }
 
         /**
@@ -91,13 +95,23 @@
          * @description
          * Retrieves an object with the given ID.
          *
-         * @param  {string}  id the ID of the object
-         * @return {Promise}    the promise resolving to server response, rejects if ID is not given or if the request
-         *                      fails
+         * @param  {string}  id            the ID of the object
+         * @param  {string}  versionNumber the optional version number of the object
+         * @return {Promise}               the promise resolving to server response,
+         *                                 rejects if ID is not given or if the request fails
          */
-        function get(id) {
+        function get(id, versionNumber) {
             if (id) {
-                return this.resource.get({
+                var resourceUrl = this.resourceUrl,
+                    params = {
+                        versionNumber: versionNumber
+                    },
+                    resource = this.resource;
+
+                if (this.config && this.config.cache) {
+                    resource = generateResource(resourceUrl, this.lastModified, this.config, params);
+                }
+                return resource.get({
                     id: id
                 }).$promise;
             }
@@ -135,10 +149,17 @@
          * @return {Promise}        the promise resolving to the server response, rejected if request fails
          */
         function query(params) {
-            var requests = [];
-            var resource = this.resource;
+            var requests = [],
+                resourceUrl = this.resourceUrl,
+                config = this.config,
+                resource = this.resource,
+                lastModified = this.lastModified;
+
             this.splitter.split(this.uri, params)
                 .forEach(function(params) {
+                    if (config && config.cache && !params) {
+                        resource = generateResource(resourceUrl, lastModified, config, params);
+                    }
                     requests.push(resource.query(params).$promise);
                 });
 
@@ -176,7 +197,13 @@
          */
         function update(object) {
             if (object) {
-                return this.resource.update({
+                var resourceUrl = this.resourceUrl,
+                    resource = this.resource;
+
+                if (this.config && this.config.cache) {
+                    resource = generateResource(resourceUrl, undefined, this.config, undefined);
+                }
+                return resource.update({
                     id: object[this.idParam]
                 }, object).$promise;
             }
@@ -196,7 +223,34 @@
          * @return {Promise}               the promise resolving to the server response, rejected if request fails
          */
         function create(object, customParams) {
-            return this.resource.save(customParams, object).$promise;
+            var resourceUrl = this.resourceUrl,
+                resource = this.resource;
+
+            if (this.config && this.config.cache) {
+                resource = generateResource(resourceUrl, undefined, this.config, customParams);
+            }
+            return resource.save(customParams, object).$promise;
+        }
+
+        /**
+         * @ngdoc method
+         * @methodOf openlmis-repository.OpenlmisResource
+         * @name search
+         * 
+         * @description
+         * Search the given objects on the OpenLMIS server. Uses POST method.
+         * 
+         * @param  {Object}  objectsList   the objects list to be searched on the server
+         * @return {Promise}               the promise resolving to the server response, rejected if request fails
+         */
+        function search(objectsList) {
+            if (objectsList) {
+                var resourceUrl = this.resourceUrl;
+                var resource = generateResource(resourceUrl, undefined, this.config, undefined);
+
+                return resource.search(undefined, objectsList).$promise;
+            }
+            return $q.reject();
         }
 
         /**
@@ -212,8 +266,14 @@
          *                          undefined or if the ID is undefined
          */
         function deleteObject(object) {
+            var resourceUrl = this.resourceUrl,
+                resource = this.resource;
+
+            if (this.config && this.config.cache) {
+                resource = generateResource(resourceUrl, {}, this.config, undefined);
+            }
             if (object && object[this.idParam]) {
-                return this.resource.delete({
+                return resource.delete({
                     id: object[this.idParam]
                 }).$promise;
             }
@@ -242,6 +302,97 @@
                 return config.idParam || 'id';
             }
             return 'id';
+        }
+
+        function generateResource(resourceUrl, headerValue, config, params) {
+            var header = {};
+
+            if (headerValue) {
+                header['If-Modified-Since'] = headerValue;
+            }
+
+            return $resource(resourceUrl + '/:id', params, {
+                get: {
+                    method: 'GET',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    },
+                    headers: header,
+                    isArray: !isPaginated(config)
+                },
+                query: {
+                    url: resourceUrl,
+                    method: 'GET',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    },
+                    headers: header,
+                    isArray: !isPaginated(config)
+                },
+                update: {
+                    method: 'PUT',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    }
+                },
+                save: {
+                    method: 'POST',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    }
+                },
+                search: {
+                    method: 'POST',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    }
+                },
+                delete: {
+                    method: 'DELETE',
+                    transformResponse: function(data, headers, status) {
+                        return transformResponse(data, headers, status, config);
+                    }
+                }
+            });
+        }
+
+        function transformJson(data) {
+            if (data) {
+                return angular.fromJson(data);
+            }
+            return data;
+        }
+
+        function transformResponse(data, headers, status, config) {
+            var response = {};
+            data = transformJson(data);
+            response.content = data;
+
+            if (response.content) {
+                if (response.content.content) {
+                    response.content.content.forEach(function(doc) {
+                        doc.lastModified = headers('last-modified');
+                        doc._id = isVersioned(config) ? doc.id + '/' + doc.meta.versionNumber : doc.id;
+                    });
+                } else if (response.content instanceof Array) {
+                    response.content.forEach(function(doc) {
+                        doc.lastModified = headers('last-modified');
+                        doc._id = isVersioned(config) ? doc.id + '/'
+                            + doc.meta.versionNumber : doc.id;
+                    });
+                } else {
+                    response.content.lastModified = headers('last-modified');
+                    response.content._id = isVersioned(config) ? response.content.id + '/'
+                        + response.content.meta.versionNumber : response.content.id;
+                }
+                response.lastModified = headers('last-modified');
+            }
+            response.status = status;
+            return response;
+        }
+
+        function isVersioned(config) {
+            return config && config.versioned;
         }
 
     }

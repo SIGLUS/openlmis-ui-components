@@ -1,14 +1,23 @@
-7.2.0 / Work in Progress
-========================
+7.2.0 / 2019-10-17
+==================
 
 New functionality added in a backwards-compatible manner:
 * [OLMIS-6350](https://openlmis.atlassian.net/browse/OLMIS-6350): Added openlmisOkIcon component.
 * [OLMIS-6380](https://openlmis.atlassian.net/browse/OLMIS-6380): Added openlmis-datetime module.
 * [OLMIS-6361](https://openlmis.atlassian.net/browse/OLMIS-6361): Added openlmis-message and openlmis-creation-details components.
 * [OLMIS-6359](https://openlmis.atlassian.net/browse/OLMIS-6359): Added missing message openlmisForm.maxlength.
+* [OLMIS-6442](https://openlmis.atlassian.net/browse/OLMIS-6442): Added confirmation modal to the FunctionDecorator.
+* [OLMIS-6441](https://openlmis.atlassian.net/browse/OLMIS-6441): Added directive positive-decimal.
+* [OLMIS-6487](https://openlmis.atlassian.net/browse/OLMIS-6487): Added implementation for get and getAll functions in OpenlmisCacheResource on UI.
+* [OLMIS-6538](https://openlmis.atlassian.net/browse/OLMIS-6538): Added implementation for getVersionedIds function in OpenlmisCacheResource on UI to search multiple id with specific version.
+
+* [OLMIS-6486](https://openlmis.atlassian.net/browse/OLMIS-6486): Added implementation for create, update and delete functions in OpenlmisCacheResource on UI.
+* [OLMIS-6438](https://openlmis.atlassian.net/browse/OLMIS-6438): Added possibility to use filter component in modal.
 
 Improvements:
 * [OLMIS-6357](https://openlmis.atlassian.net/browse/OLMIS-6357): Updated LocalDatabase to reopen database connection for every action.
+* [OLMIS-6222](https://openlmis.atlassian.net/browse/OLMIS-6222): Added paginationId attribute to pagination.
+* [OLMIS-6416](https://openlmis.atlassian.net/browse/OLMIS-6416): Updated OpenlmisCachedResource getByVersionIdentities to avoid sending requests when offline.
 
 Bug fixes:
 * [OLMIS-6403](https://openlmis.atlassian.net/browse/OLMIS-6403) Fixed incorrect Start Date and Expiry Date behaviour for system notifications.

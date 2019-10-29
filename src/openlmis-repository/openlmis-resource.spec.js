@@ -39,8 +39,10 @@ describe('OpenlmisResource', function() {
 
         this.BASE_URL = 'some.url/com';
         this.openlmisResource = new this.OpenlmisResource(this.BASE_URL);
+        this.lastModified = 'Thu, 22 Aug 2019 09:18:43 GMT';
 
         this.page = new this.PageDataBuilder().build();
+        this.lastModified = 'Thu, 22 Aug 2019 09:18:43 GMT';
     });
 
     describe('constructor', function() {
@@ -98,6 +100,90 @@ describe('OpenlmisResource', function() {
             }, {
                 id: 'obj-four'
             }]);
+
+            this.pageWithLastModified = this.PageDataBuilder.buildWithContent([{
+                id: 'obj-one',
+                lastModified: this.lastModified,
+                _id: 'obj-one'
+            }, {
+                id: 'obj-two',
+                lastModified: this.lastModified,
+                _id: 'obj-two'
+            }]);
+
+            this.pageVersioned = this.PageDataBuilder.buildWithContent([{
+                id: 'obj-one',
+                lastModified: this.lastModified,
+                _id: 'obj-one/1',
+                meta: {
+                    versionNumber: 1
+                }
+            }, {
+                id: 'obj-two',
+                lastModified: this.lastModified,
+                _id: 'obj-two/1',
+                meta: {
+                    versionNumber: 1
+                }
+            }]);
+        });
+
+        it('should resolve to response for cache, nonversioned, without params on successful request', function() {
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: false
+            });
+            this.parameterSplitterMock.split.andReturn([undefined]);
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL))
+                .respond(200, this.pageWithLastModified, {
+                    'last-modified': this.lastModified
+                });
+
+            var result,
+                status,
+                lastModified;
+            openlmisResource.query(undefined, this.lastModified)
+                .then(function(response) {
+                    result = response.content.content;
+                    status = response.status;
+                    lastModified = response.lastModified;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(this.pageWithLastModified.content));
+            expect(status).toEqual(200);
+            expect(lastModified).toEqual(this.lastModified);
+        });
+
+        it('should resolve to response for cache versioned, without params on successful request', function() {
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            this.parameterSplitterMock.split.andReturn([undefined]);
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL))
+                .respond(200, this.pageVersioned, {
+                    'last-modified': this.lastModified
+                });
+
+            var result,
+                status,
+                lastModified;
+            openlmisResource.query(undefined, this.lastModified)
+                .then(function(response) {
+                    result = response.content.content;
+                    status = response.status;
+                    lastModified = response.lastModified;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(this.pageVersioned.content));
+            expect(status).toEqual(200);
+            expect(lastModified).toEqual(this.lastModified);
         });
 
         it('should return page if only one request was sent', function() {
@@ -210,6 +296,32 @@ describe('OpenlmisResource', function() {
             }, {
                 id: 'obj-four'
             }];
+
+            this.pageWithLastModified = [{
+                id: 'obj-one',
+                lastModified: this.lastModified,
+                _id: 'obj-one'
+            }, {
+                id: 'obj-two',
+                lastModified: this.lastModified,
+                _id: 'obj-two'
+            }];
+
+            this.pageVersioned = [{
+                id: 'obj-one',
+                lastModified: this.lastModified,
+                _id: 'obj-one/1',
+                meta: {
+                    versionNumber: 1
+                }
+            }, {
+                id: 'obj-two',
+                lastModified: this.lastModified,
+                _id: 'obj-two/1',
+                meta: {
+                    versionNumber: 1
+                }
+            }];
         });
 
         it('should return response if only one request was sent', function() {
@@ -231,6 +343,64 @@ describe('OpenlmisResource', function() {
             this.$httpBackend.flush();
 
             expect(angular.toJson(result)).toEqual(angular.toJson(this.response));
+        });
+
+        it('should resolve to response for cache, nonversioned, without params on successful request', function() {
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: false
+            });
+            this.parameterSplitterMock.split.andReturn([undefined]);
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL))
+                .respond(200, this.pageWithLastModified, {
+                    'last-modified': this.lastModified
+                });
+
+            var result,
+                status,
+                lastModified;
+            openlmisResource.query(undefined, this.lastModified)
+                .then(function(response) {
+                    result = response.content.content;
+                    status = response.status;
+                    lastModified = response.lastModified;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(this.pageWithLastModified.content));
+            expect(status).toEqual(200);
+            expect(lastModified).toEqual(this.lastModified);
+        });
+
+        it('should resolve to response for cache versioned, without params on successful request', function() {
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            this.parameterSplitterMock.split.andReturn([undefined]);
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL))
+                .respond(200, this.pageVersioned, {
+                    'last-modified': this.lastModified
+                });
+
+            var result,
+                status,
+                lastModified;
+            openlmisResource.query(undefined, this.lastModified)
+                .then(function(response) {
+                    result = response.content.content;
+                    status = response.status;
+                    lastModified = response.lastModified;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(this.pageVersioned.content));
+            expect(status).toEqual(200);
+            expect(lastModified).toEqual(this.lastModified);
         });
 
         it('should reject if any of the requests fails', function() {
@@ -303,6 +473,70 @@ describe('OpenlmisResource', function() {
             expect(angular.toJson(result)).toEqual(angular.toJson(this.response));
         });
 
+        it('should resolve to server response for cache nonversioned on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id',
+                some: 'test-object',
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL + '/' + this.response.id))
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.get(response.id)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
+        });
+
+        it('should resolve to server response for cache versioned on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id/1',
+                some: 'test-object',
+                meta: {},
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            response.meta['versionNumber'] = 1;
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+
+            this.$httpBackend
+                .expectGET(this.openlmisUrlFactory(this.BASE_URL + '/' + this.response.id))
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.get(response.id)
+                .then(function(response) {
+                    result = response.content;
+                });
+
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
+        });
+
         it('should reject on failed request', function() {
             this.$httpBackend
                 .expectGET(this.openlmisUrlFactory(this.BASE_URL + '/' + this.response.id))
@@ -359,6 +593,67 @@ describe('OpenlmisResource', function() {
             expect(angular.toJson(result)).toEqual(angular.toJson(this.response));
         });
 
+        it('should resolve to server response to cache versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id/1',
+                some: 'test-object',
+                meta: {},
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            response.meta['versionNumber'] = 1;
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectPOST(this.openlmisUrlFactory(this.BASE_URL), response)
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.create(response)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
+        });
+
+        it('should resolve to server response to cache non-versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id',
+                some: 'test-object',
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectPOST(this.openlmisUrlFactory(this.BASE_URL), response)
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.create(response)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
+        });
+
         it('should reject on failed request', function() {
             this.$httpBackend
                 .expectPOST(this.openlmisUrlFactory(this.BASE_URL), this.object)
@@ -399,6 +694,76 @@ describe('OpenlmisResource', function() {
 
     });
 
+    describe('search', function() {
+
+        beforeEach(function() {
+            this.response = {
+                id: 'some-id',
+                _id: 'some-id/1',
+                some: 'test-object',
+                meta: {
+                    versionNumber: 1
+                },
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            this.object = [{
+                id: 'some-id',
+                varsionNumber: 1
+            }];
+
+            this.openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+        });
+
+        it('should resolve to server response on successful request', function() {
+            this.$httpBackend
+                .expectPOST(this.openlmisUrlFactory(this.BASE_URL), this.object)
+                .respond(200, this.response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            this.openlmisResource.search(this.object)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(this.response));
+        });
+
+        it('should reject on failed request', function() {
+            this.$httpBackend
+                .expectPOST(this.openlmisUrlFactory(this.BASE_URL), this.object)
+                .respond(400);
+
+            var rejected;
+            this.openlmisResource.search(this.object)
+                .catch(function() {
+                    rejected = true;
+                });
+            this.$httpBackend.flush();
+
+            expect(rejected).toEqual(true);
+        });
+
+        it('should reject if null was given', function() {
+            var rejected;
+            this.openlmisResource.search()
+                .catch(function() {
+                    rejected = true;
+                });
+            this.$rootScope.$apply();
+
+            expect(rejected).toBe(true);
+        });
+
+    });
+
     describe('update', function() {
 
         beforeEach(function() {
@@ -422,6 +787,67 @@ describe('OpenlmisResource', function() {
             this.$httpBackend.flush();
 
             expect(angular.toJson(result)).toEqual(angular.toJson(this.object));
+        });
+
+        it('should resolve to server response to cache versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id/1',
+                some: 'test-object',
+                meta: {},
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            response.meta['versionNumber'] = 1;
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectPUT(this.openlmisUrlFactory(this.BASE_URL + '/' + response.id), response)
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.update(response)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
+        });
+
+        it('should resolve to server response to cache non-versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id',
+                some: 'test-object',
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectPUT(this.openlmisUrlFactory(this.BASE_URL + '/' + response.id), response)
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var result;
+            openlmisResource.update(response)
+                .then(function(response) {
+                    result = response.content;
+                });
+            this.$httpBackend.flush();
+
+            expect(angular.toJson(result)).toEqual(angular.toJson(response));
         });
 
         it('should reject on failed request', function() {
@@ -483,6 +909,67 @@ describe('OpenlmisResource', function() {
 
             var resolved;
             this.openlmisResource.delete(this.object)
+                .then(function() {
+                    resolved = true;
+                });
+            this.$httpBackend.flush();
+
+            expect(resolved).toEqual(true);
+        });
+
+        it('should resolve to server response to cache versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id/1',
+                some: 'test-object',
+                meta: {},
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            response.meta['versionNumber'] = 1;
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true,
+                versioned: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectDELETE(this.openlmisUrlFactory(this.BASE_URL + '/' + response.id))
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var resolved;
+            openlmisResource.delete(response)
+                .then(function() {
+                    resolved = true;
+                });
+            this.$httpBackend.flush();
+
+            expect(resolved).toEqual(true);
+        });
+
+        it('should resolve to server response to cache non-versioned resource on successful request', function() {
+            var response = {
+                id: 'some-id',
+                _id: 'some-id',
+                some: 'test-object',
+                lastModified: this.lastModified,
+                status: 200
+            };
+
+            var openlmisResource = new this.OpenlmisResource(this.BASE_URL, {
+                cache: true
+            });
+            openlmisResource.lastModified = this.lastModified;
+            this.$httpBackend
+                .expectDELETE(this.openlmisUrlFactory(this.BASE_URL + '/' + response.id))
+                .respond(200, response, {
+                    'last-modified': this.lastModified
+                });
+
+            var resolved;
+            openlmisResource.delete(response)
                 .then(function() {
                     resolved = true;
                 });
