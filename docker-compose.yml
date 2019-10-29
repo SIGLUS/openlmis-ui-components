@@ -11,4 +11,4 @@ services:
     env_file: .env
   image:
     build: .
-    image: openlmis/ui-components
+    image: siglusdevops/ui-components
