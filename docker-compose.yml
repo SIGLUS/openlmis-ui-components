@@ -1,7 +1,8 @@
 version: "2"
 services:
   ui-components:
-    image: openlmis/dev-ui:9.0.1
+    image: siglusdevops/dev-ui
+    user: "${UID}"
     ports:
       - "9000:9000"
       - "9876:9876"
