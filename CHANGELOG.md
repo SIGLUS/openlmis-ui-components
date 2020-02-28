@@ -1,3 +1,13 @@
+7.2.1 / 2019-12-19
+==================
+
+Improvements:
+* [OLMIS-6684](https://openlmis.atlassian.net/browse/OLMIS-6684): Updated pagination component to allow providing a function to call before changing page.
+    * Got rid of angular.copy to improve performance in some places.
+    
+Bug fixes:
+* [OLMIS-6612](https://openlmis.atlassian.net/browse/OLMIS-6612): Added check whether the property exists before sorting array by given property.
+
 7.2.0 / 2019-10-17
 ==================
 

@@ -135,9 +135,15 @@
          */
         function changePage(newPage) {
             if (newPage >= 0 && newPage < getTotalPages()) {
-                var stateParams = angular.copy($stateParams);
+                var stateParams = JSON.parse(JSON.stringify($stateParams));
 
                 stateParams[paginationService.getPageParamName(pagination.paginationId)] = newPage;
+
+                if (pagination.onPageChange instanceof Function) {
+                    return pagination.onPageChange().then(function() {
+                        $state.go($state.current.name, stateParams);
+                    });
+                }
 
                 $state.go($state.current.name, stateParams);
             }
