@@ -103,7 +103,8 @@ describe('PaginationController', function() {
 
             expect(this.$state.go).toHaveBeenCalledWith(this.$state.current.name, {
                 customPageParamName: this.newPage,
-                size: 2
+                size: 2,
+                hasChangePage: true
             });
         });
 
@@ -117,7 +118,8 @@ describe('PaginationController', function() {
 
             expect(this.$state.go).toHaveBeenCalledWith(this.$state.current.name, {
                 customPageParamName: this.newPage,
-                size: 2
+                size: 2,
+                hasChangePage: true
             });
         });
 
@@ -136,7 +138,8 @@ describe('PaginationController', function() {
 
             expect(this.$state.go).toHaveBeenCalledWith(this.$state.current.name, {
                 customPageParamName: lastPage + 1,
-                size: 2
+                size: 2,
+                hasChangePage: true
             });
         });
     });
@@ -149,7 +152,8 @@ describe('PaginationController', function() {
 
             expect(this.$state.go).toHaveBeenCalledWith(this.$state.current.name, {
                 customPageParamName: lastPage - 1,
-                size: 2
+                size: 2,
+                hasChangePage: true
             });
         });
     });

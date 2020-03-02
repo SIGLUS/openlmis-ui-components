@@ -136,6 +136,27 @@
         function changePage(newPage) {
             if (newPage >= 0 && newPage < getTotalPages()) {
                 var stateParams = angular.copy($stateParams);
+                // when change page, then displayItems will be undefined then cause empty table
+                if (pagination.paginationId && pagination.paginationId.indexOf('stock-management') !== -1) {
+                    if (pagination.paginationId === 'stock-management-physical-inventory') {
+                        stateParams = _.defaults(stateParams, $state.params);
+                        stateParams.draft.lineItems = _.flatten(pagination.list);
+                    } else {
+                        stateParams = _.extend(stateParams, $state.params);
+                        if ((stateParams.hasOwnProperty('displayItems') && stateParams.displayItems === undefined)
+                        || (_.isArray(stateParams.displayItems) && stateParams.displayItems.length === 0)) {
+                            stateParams.displayItems = pagination.list;
+                        }
+                    }
+                }
+
+                if (pagination.paginationId && pagination.paginationId.indexOf('select-products-modal') !== -1) {
+                    pagination.page = newPage;
+                    pagination.pageSize = paginationService.getSize(pagination.paginationId);
+                    pagination.pagedList = paginationFactory.getPage(pagination.list, newPage, pagination.pageSize);
+                }
+                // flag for change page
+                stateParams.hasChangePage = true;
 
                 stateParams[paginationService.getPageParamName(pagination.paginationId)] = newPage;
 
