@@ -30,9 +30,4 @@
         background: $color;
         border-color: $color;
     }
-
-    &.disabled,
-    &[disabled] {
-        opacity: 0.5;
-    }
 }
